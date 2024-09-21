@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev" : "nodemon src/app.js"
+    "dev": "nodemon src/app.js"
   },
   "author": "srijan",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "express": "^4.21.0",
+    "mongoose": "^8.6.3",
     "nodemon": "^3.1.6"
   }
 }

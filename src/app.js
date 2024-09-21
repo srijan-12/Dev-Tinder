@@ -1,5 +1,6 @@
 const express = require("express");
 
+
 const app = express();
 
 
@@ -83,6 +84,33 @@ const app = express();
 // })
 
 
-app.listen(3000 , ()=>{
-    console.log(`Server is up and running at port 3000`)
+
+
+
+
+
+
+
+
+
+
+
+const connectDB = require("./config/database.js");
+connectDB().then(()=>{
+    console.log(`Database connected successfully`);
+    app.listen(3000 , ()=>{
+        console.log(`Server is up and running at port 3000`)
+    })
 })
+.catch((err)=>{
+    console.log(`Database could not be connected, ${err}`);
+})
+
+
+
+
+
+
+
+
+
