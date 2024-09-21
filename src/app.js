@@ -90,7 +90,26 @@ const app = express();
 
 
 
+const User = require("./models/user.js");
+app.post("/signup", async(req,res)=>{
+    let userData = {
+        firstName : 'Ishu',
+        lastName : 'Sinha',
+        email : 'srijansinha@gmail.com',
+        password : 'srijan123',
+        gender : 'male',
+        age : 23
+    }
+let user1 = new User(userData);
+try{
+    // throw new Error('error saving')
+    await user1.save();
+    res.send('user added to database');
+}catch(err){
+    res.status(400).send(`Error while saving user info`);
+}
 
+})
 
 
 

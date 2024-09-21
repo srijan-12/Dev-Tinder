@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
-const dbConnectionString = 'mongodb+srv://srijan122001:xtK4oshl7cpIQyKU@srijan.6nhyh.mongodb.net';
+// console.log(mongoose.Schema);
+const dbConnectionString = 'mongodb+srv://srijan122001:xtK4oshl7cpIQyKU@srijan.6nhyh.mongodb.net/devTinder';
 
 
 async function connectDB(){
