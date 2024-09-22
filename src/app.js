@@ -5,7 +5,7 @@ const app = express();
 
 
 // app.use(express.urlencoded({ extended: true }));
-// app.use(express.json());
+app.use(express.json());
 
 // app.get("/user",(req,res)=>{
 //     res.send('This is a user get')
@@ -91,25 +91,57 @@ const app = express();
 
 
 const User = require("./models/user.js");
-app.post("/signup", async(req,res)=>{
-    let userData = {
-        firstName : 'Ishu',
-        lastName : 'Sinha',
-        email : 'srijansinha@gmail.com',
-        password : 'srijan123',
-        gender : 'male',
-        age : 23
-    }
-let user1 = new User(userData);
-try{
-    // throw new Error('error saving')
-    await user1.save();
-    res.send('user added to database');
-}catch(err){
-    res.status(400).send(`Error while saving user info`);
-}
+// hardcoding
+// app.post("/signup", async(req,res)=>{
+//     let userData = {
+//         firstName : 'Ishu',
+//         lastName : 'Sinha',
+//         email : 'srijansinha@gmail.com',
+//         password : 'srijan123',
+//         gender : 'male',
+//         age : 23
+//     }
+// let user1 = new User(userData);
+// try{
+//     // throw new Error('error saving')
+//     await user1.save();
+//     res.send('user added to database');
+// }catch(err){
+//     res.status(400).send(`Error while saving user info`);
+// }
 
+// })
+
+
+
+//dynamic
+app.post("/signup", async(req,res)=>{
+    let userX = new User(req.body);
+
+    try{
+        await userX.save();
+        console.log(`User added to Database`);
+        res.send(`User added to Database`);
+    }catch(err){
+        console.log(`error`, err);
+        console.log(`error sending data to datbase`);
+    }
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
