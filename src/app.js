@@ -90,7 +90,7 @@ app.use(express.json());
 
 
 
-const User = require("./models/user.js");
+
 // hardcoding
 // app.post("/signup", async(req,res)=>{
 //     let userData = {
@@ -115,16 +115,110 @@ const User = require("./models/user.js");
 
 
 //dynamic
-app.post("/signup", async(req,res)=>{
-    let userX = new User(req.body);
+// app.post("/signup", async(req,res)=>{
+//     let userX = new User(req.body);
 
+//     try{
+//         await userX.save();
+//         console.log(`User added to Database`);
+//         res.send(`User added to Database`);
+//     }catch(err){
+//         console.log(`error`, err);
+//         console.log(`error sending data to datbase`);
+//     }
+// })
+
+
+
+//get single user
+
+// app.get("/findUser" , async(req,res)=>{
+//     let userEmail = req.body.email;
+//     try{
+//         // throw new Error(`Intentional Error`)
+//         let user = await User.findById({_id : "66eef8f0ccab000baa59d849"});
+//         console.log(user);
+//         if(user.length === 0 || user === null){
+//             res.send(`User not found`);
+//         }else{
+//             res.send(user)
+//         }
+//     }catch(err){
+//         res.send(`something went wrong`);
+//     }
+// })
+
+
+// Database level operations 
+const User = require("./models/user.js")
+
+// 1. inserting
+app.post("/user/signup", async(req,res)=>{
+    let userData = req.body;
+    console.log(req.body);
     try{
+        let userX = new User(userData);
         await userX.save();
-        console.log(`User added to Database`);
-        res.send(`User added to Database`);
+        res.send(`User data saved successfully`)
     }catch(err){
-        console.log(`error`, err);
-        console.log(`error sending data to datbase`);
+        res.send(`User data could not be saved.`);
+        console.log(err);
+    }
+})
+
+//reading all
+app.get("/user/feed",async(req,res)=>{
+    try{
+        let userData = await User.find({});
+        res.send(userData);
+    }catch(err){
+        res.status(500).send(`Something went wrong while getting the feed`);
+        console.log(err);
+    }
+})
+
+//reading based on email
+app.post("/user/userinfo", async(req,res)=>{
+    let userEmail = req.body.email;
+    try{
+        let result = await User.find({email : userEmail});
+        if(result.length === 0){
+            res.send(`No such user found`)
+        }else{
+            res.send(result);
+        }
+    }catch(err){
+        res.status(500).send(`Something went wrong while getting the User`);
+        console.log(`user email`,err);
+    }
+})
+
+//update
+app.patch("/user/update", async(req,res)=>{
+    let userId = req.body._id;
+    let updateValue = req.body;
+    try{
+        let result = await User.findByIdAndUpdate(userId, updateValue, {runValidators : true});
+        console.log(result);
+        res.send(`updated`);
+
+    }catch(err){
+        res.status(500).send(`Something went wrong while updating`);
+        console.log(`user info update`,err);
+    }
+
+})
+
+
+//delete
+app.delete("/user/delete", async(req,res)=>{
+    let userId = req.body._id;
+    try{
+        await User.findByIdAndDelete(userId);
+        res.send(`User deleted`);
+    }catch(err){
+        res.status(500).send(`Something went wrong while deleting user`);
+        console.log(`user info update`,err);
     }
 })
 
@@ -140,22 +234,16 @@ app.post("/signup", async(req,res)=>{
 
 
 
-
-
-
-
-
-
-const connectDB = require("./config/database.js");
+//starting the server if db connects
+const connectDB = require("./config/Database.js");
 connectDB().then(()=>{
-    console.log(`Database connected successfully`);
-    app.listen(3000 , ()=>{
-        console.log(`Server is up and running at port 3000`)
-    })
+    console.log(`Database connected`);
+    app.listen(3000, ()=> console.log(`Server started successfully at port 3000`));
+}).catch((err)=>{
+    console.log(`Error while starting the server`, err);
 })
-.catch((err)=>{
-    console.log(`Database could not be connected, ${err}`);
-})
+
+
 
 
 
