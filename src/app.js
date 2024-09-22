@@ -197,14 +197,22 @@ app.post("/user/userinfo", async(req,res)=>{
 app.patch("/user/update", async(req,res)=>{
     let userId = req.body._id;
     let updateValue = req.body;
+    
+        
     try{
+        let allowedFields = ["_id" ,"firstName", "lastName", "phoneNumber", "password","age" ,"photoUrl"];
+        const resultChange = Object.keys(updateValue).every((key)=> allowedFields.includes(key));
+        // console.log(resultChange);
+        if(!resultChange){
+            throw new Error("Update Failed")
+        }
         let result = await User.findByIdAndUpdate(userId, updateValue, {runValidators : true});
         console.log(result);
         res.send(`updated`);
 
     }catch(err){
-        res.status(500).send(`Something went wrong while updating`);
-        console.log(`user info update`,err);
+        res.status(400).send(`Something went wrong while updating `+ err);
+        console.log(`user info update`);
     }
 
 })
