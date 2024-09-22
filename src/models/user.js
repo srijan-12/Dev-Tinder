@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const validator = require("validator");
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -15,7 +15,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true
+    unique: true,
+    validate(value){
+        if(!validator.isEmail(value)){
+            throw new Error(`Invalid email`);
+        }
+    }
   },
   phoneNumber: {
     type: Number,
@@ -27,21 +32,14 @@ const userSchema = new mongoose.Schema({
     trim: true,
     minlength: 8, 
     validate(value) {
-      
-      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
-      if (!alphanumericRegex.test(value)) {
-        throw new Error('Password must be alphanumeric and at least 8 characters long.');
-      }
+        if(!validator.isStrongPassword(value)){
+            throw new Error(`Password is vernuable, try with alphanumeric and special characters together`);
+        }
     },
   },
   age: {
     type: Number,
     min: 18,
-    // validate(value) {
-    //   if (value < 18) {
-    //     throw new Error('You have to be 18+');
-    //   }
-    // },
   },
   gender: {
     type: String,
@@ -53,7 +51,12 @@ const userSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    default: "xyz//+123DEFVAL",
+    default: "https://akshaysaini.in/img/akshay.jpg",
+    validate(value){
+        if(!validator.isURL(value)){
+            throw new Error(`Enter correct url`)
+        }
+    }
   }
 }, {
   timestamps: true,
