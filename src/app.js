@@ -152,20 +152,54 @@ app.use(express.json());
 // Database level operations 
 const User = require("./models/user.js");
 const {validateSignUp} = require("./utils/validations.js");
-
+const hashPassword = require("./utils/passwordEncrypt.js");
 // 1. inserting
 app.post("/user/signup", async(req,res)=>{
-    let userData = req.body;
-    // console.log(req.body);
+    const {firstName,lastName,email,phoneNumber,password,age,gender,photoUrl} = req.body;
     try{
         validateSignUp(req);
-        let userX = new User(userData);
+        let hashed = await hashPassword(password);
+        let userX = new User({
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            password : hashed,
+            age,
+            gender,
+            photoUrl
+        });
+
         await userX.save();
         res.send(`User data saved successfully`)
     }catch(err){
         res.send(`User data could not be saved.` + err);
         console.log(err);
     }
+})
+
+
+//logging in
+const bcrypt = require("bcrypt");
+app.post("/user/login",async(req,res)=>{
+    let {email, password} = req.body;
+    try{
+        let foundUser = await User.findOne({email});
+        if(!foundUser){
+            throw new Error(`Invalid credentials`);
+        }else{
+            let result = await bcrypt.compare(password, foundUser.password);
+            if(result){
+                res.send(`Logged in`)
+            }else{
+                throw new Error(`Invalid credentials`)
+            }
+        }
+    }catch(err){
+        res.send(`User data could not be saved.` + err);
+        console.log(err);
+    }
+    
 })
 
 //reading all
