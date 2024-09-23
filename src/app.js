@@ -1,11 +1,13 @@
 const express = require("express");
-
+const cookieParser = require("cookie-parser");
+const jwt = require(`jsonwebtoken`);
 
 const app = express();
 
 
 // app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cookieParser());
 
 // app.get("/user",(req,res)=>{
 //     res.send('This is a user get')
@@ -190,7 +192,20 @@ app.post("/user/login",async(req,res)=>{
         }else{
             let result = await bcrypt.compare(password, foundUser.password);
             if(result){
-                res.send(`Logged in`)
+                
+
+
+
+                //cookies work here
+                let userId = foundUser._id;
+                console.log(`userId : ${userId}`);
+                const token = jwt.sign({userId}, "Thisismy@SECRETkey#12905567")
+                console.log(`token for logged in user : ${token}`);
+                res.cookie("token",token);
+                res.send(`Logged in`);
+
+
+
             }else{
                 throw new Error(`Invalid credentials`)
             }
@@ -213,16 +228,32 @@ app.get("/user/feed",async(req,res)=>{
     }
 })
 
-//reading based on email
+//reading based on email  cookie work here
 app.post("/user/userinfo", async(req,res)=>{
     let userEmail = req.body.email;
     try{
-        let result = await User.find({email : userEmail});
-        if(result.length === 0){
+
+
+
+
+        let cookies = req.cookies;
+        const {token} = cookies;
+        if(!token){
+            throw new Error(`Please login again`);
+        }else{
+            let decodedId = jwt.verify(token,"Thisismy@SECRETkey#12905567");
+            const {userId} = decodedId
+            console.log(userId,"this is decoded id")
+            const userFound = await User.findById(userId);
+        if(!userFound){
             res.send(`No such user found`)
         }else{
-            res.send(result);
-        }
+            res.send(userFound);
+        }}
+
+
+
+        
     }catch(err){
         res.status(500).send(`Something went wrong while getting the User`);
         console.log(`user email`,err);
