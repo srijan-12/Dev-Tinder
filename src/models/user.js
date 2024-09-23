@@ -24,7 +24,8 @@ const userSchema = new mongoose.Schema({
   },
   phoneNumber: {
     type: Number,
-    unique : true
+    unique : true,
+    required : true
   },
   password: {
     type: String,
@@ -40,9 +41,11 @@ const userSchema = new mongoose.Schema({
   age: {
     type: Number,
     min: 18,
+    required : true
   },
   gender: {
     type: String,
+    required : true,
     validate(value) {
       if (!["male", "female", "others"].includes(value)) {
         throw new Error('Invalid gender. Please choose between "male", "female", or "others".');

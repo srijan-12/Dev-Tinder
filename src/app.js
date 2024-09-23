@@ -150,18 +150,20 @@ app.use(express.json());
 
 
 // Database level operations 
-const User = require("./models/user.js")
+const User = require("./models/user.js");
+const {validateSignUp} = require("./utils/validations.js");
 
 // 1. inserting
 app.post("/user/signup", async(req,res)=>{
     let userData = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     try{
+        validateSignUp(req);
         let userX = new User(userData);
         await userX.save();
         res.send(`User data saved successfully`)
     }catch(err){
-        res.send(`User data could not be saved.`);
+        res.send(`User data could not be saved.` + err);
         console.log(err);
     }
 })
