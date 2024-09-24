@@ -27,4 +27,20 @@ const validateSignUp = (req) =>{
         }
 }
 
-module.exports = {validateSignUp};
+
+const validateLogin = (req) =>{
+    const {email,password} = req.body;
+    function trimHere(str){
+        return str.trim();
+    }
+        let trimedEmail = trimHere(email);
+        let trimedPassword = trimHere(password);
+    
+        if(!validator.isEmail(trimedEmail)){
+            throw new Error(`Please enter valid e-mail`)
+        }else if(!validator.isStrongPassword(trimedPassword)){
+            throw new Error(`Password must contains alphanumeric and special characters and must be atleast 8-digits long`)
+        }
+}
+
+module.exports = {validateSignUp, validateLogin};
