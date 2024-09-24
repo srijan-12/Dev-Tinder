@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const jwt = require(`jsonwebtoken`);
+const {userAth} = require("./middlewares/userAuthentication.js");
 
 const app = express();
 
@@ -199,9 +200,13 @@ app.post("/user/login",async(req,res)=>{
                 //cookies work here
                 let userId = foundUser._id;
                 console.log(`userId : ${userId}`);
-                const token = jwt.sign({userId}, "Thisismy@SECRETkey#12905567")
+                const token = jwt.sign({userId}, "Thisismy@SECRETkey#12905567",{
+                    expiresIn: "1d"
+                })
                 console.log(`token for logged in user : ${token}`);
-                res.cookie("token",token);
+                res.cookie("token",token, {
+                    maxAge : 24 * 60*60*1000
+                });
                 res.send(`Logged in`);
 
 
@@ -218,7 +223,7 @@ app.post("/user/login",async(req,res)=>{
 })
 
 //reading all
-app.get("/user/feed",async(req,res)=>{
+app.get("/user/feed", userAth, async(req,res)=>{
     try{
         let userData = await User.find({});
         res.send(userData);
@@ -229,31 +234,10 @@ app.get("/user/feed",async(req,res)=>{
 })
 
 //reading based on email  cookie work here
-app.post("/user/userinfo", async(req,res)=>{
+app.post("/user/userinfo", userAth, async(req,res)=>{
     let userEmail = req.body.email;
     try{
-
-
-
-
-        let cookies = req.cookies;
-        const {token} = cookies;
-        if(!token){
-            throw new Error(`Please login again`);
-        }else{
-            let decodedId = jwt.verify(token,"Thisismy@SECRETkey#12905567");
-            const {userId} = decodedId
-            console.log(userId,"this is decoded id")
-            const userFound = await User.findById(userId);
-        if(!userFound){
-            res.send(`No such user found`)
-        }else{
-            res.send(userFound);
-        }}
-
-
-
-        
+        res.send(userFound);
     }catch(err){
         res.status(500).send(`Something went wrong while getting the User`);
         console.log(`user email`,err);
@@ -261,7 +245,7 @@ app.post("/user/userinfo", async(req,res)=>{
 })
 
 //update
-app.patch("/user/update", async(req,res)=>{
+app.patch("/user/update",userAth, async(req,res)=>{
     let userId = req.body._id;
     let updateValue = req.body;
     
@@ -286,7 +270,7 @@ app.patch("/user/update", async(req,res)=>{
 
 
 //delete
-app.delete("/user/delete", async(req,res)=>{
+app.delete("/user/delete",userAth, async(req,res)=>{
     let userId = req.body._id;
     try{
         await User.findByIdAndDelete(userId);
