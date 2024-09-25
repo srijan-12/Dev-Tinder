@@ -9,10 +9,11 @@ const bcrypt = require("bcrypt");
 
 authRouter.post('/signup', async (req,res)=>{
     try{
+        console.log(req.body);
         validateSignUp(req);
-        const {firstName,lastName,email,phoneNumber,password,age,gender,photoUrl} = req.body;
+        const {firstName,lastName,email,phoneNumber,password,age,gender,photoUrl,skills,about} = req.body;
         let hashedPassword = await hashPassword(password);
-
+        console.log(req.body);
         let userX = new User({
             firstName,
             lastName,
@@ -21,7 +22,9 @@ authRouter.post('/signup', async (req,res)=>{
             password: hashedPassword,
             age,
             gender,
-            photoUrl
+            photoUrl,
+            skills,
+            about
         })
         await userX.save();
 
@@ -29,6 +32,7 @@ authRouter.post('/signup', async (req,res)=>{
 
     }catch(err){
         res.send(`ERROR! ${err.message}`);
+        console.log(err)
     }
 })
 

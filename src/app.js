@@ -1,16 +1,16 @@
 const express = require("express");
-
+const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database.js");
 const app = express();
 app.use(express.json());
-
+app.use(cookieParser())
 
 const authRouter = require("./Routes/authRoutes.js");
-
+const profileRouter = require("./Routes/profileRoutes.js");
 
 
 app.use("/", authRouter);
-
+app.use("/", profileRouter);
 
 connectDB().then(()=>{
     console.log(`Database connected`);
@@ -20,6 +20,3 @@ connectDB().then(()=>{
 }).catch((err)=>{
     console.log(err.message);
 })
-
-
-console.log('check')

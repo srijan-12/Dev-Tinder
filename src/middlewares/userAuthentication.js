@@ -1,25 +1,29 @@
 const jwt = require("jsonwebtoken");
-const User  = require("../models/user");
+const User  = require("../models/user.js");
 //check user is logged in or not
-async function userAth(req,res,next){
+async function userAuth(req,res,next){
    try{
      let cookies = req.cookies;
-    let {token} = cookies;
+     if(!cookies){
+        throw new Error(`Please log in again`);
+    }
+     let {token} = cookies;
     if(!token){
         throw new Error(`Please log in again`);
     }
-    let result = jwt.verify(token, "Thisismy@SECRETkey#12905567");
-    let {userId} = result;
-    const user = await User.findById(userId);
+    let result = jwt.verify(token, "s3cR3tK3y!@$qW3rTy!9^kLpXyZ#8fBvNmA1");
+    console.log(result);
+    let {_id} = result;
+    const user = await User.findById(_id);
     if(!user){
         throw new Error(`Please log in again`);
     }
     req.user = user;
     next();
     }catch(err){
-        res.status(500).send(`Something went wrong`);
+        res.status(500).send(`Something went wrong ${err.message}`);
         console.log(`from auth`,err);
     }
 }
 
-module.exports = {userAth};
+module.exports = {userAuth};

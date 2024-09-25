@@ -61,6 +61,15 @@ const userSchema = new mongoose.Schema({
             throw new Error(`Enter correct url`)
         }
     }
+  },
+  skills: {
+    type : [String],
+    require : true
+  },
+  about : {
+    type : String,
+    required : true,
+    trim : true
   }
 }, {
   timestamps: true,
