@@ -1,8 +1,8 @@
 const express = require("express");
 const profileRouter = express.Router();
+const validator = require("validator");
 const {userAuth} = require("../middlewares/userAuthentication.js");
 const {validateProfileEdit} = require("../utils/validations.js");
-const { findByIdAndUpdate } = require("../models/user.js");
 const User = require("../models/user.js");
 const {validateLogin} = require("../utils/validations.js")
 const bcrypt = require("bcrypt");
@@ -60,6 +60,9 @@ profileRouter.patch("/profile/forgetpassword", userAuth,async(req,res)=>{
         }
         validateLogin(req);
         const {email, password: userPassword, newPassword} = req.body;
+        if(!validator.isStrongPassword(newPassword)){
+            throw new Error(`New password must be a strong password`);
+        }
         let result = await bcrypt.compare(userPassword, loggedInUserHashPassword);
         if(!result){
             throw new Error(`Invalid credentials`);
