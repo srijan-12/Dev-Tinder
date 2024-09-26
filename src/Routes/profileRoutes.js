@@ -50,6 +50,9 @@ profileRouter.patch("/profile/edit",userAuth, async(req,res)=>{
     }
 })
 
+
+
+
 profileRouter.patch("/profile/forgetpassword", userAuth,async(req,res)=>{
     try{
         let loggedInUser = req.user;
