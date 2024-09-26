@@ -66,12 +66,16 @@ connectionRequestRouter.post("/request/send/:status/:userId", userAuth, async(re
             if(result && loggedInUser._id.equals(dataTo)&& result.status == "accepted"){
                 
                 throw new Error(`You guys are already buddies`);
+            }else{
+                throw new Error(`Bad Request`);
             }
+        }else{
+            const connectionRequestX = new ConnectionRequest({fromUserId,toUserId,status});
+            await connectionRequestX.save();
+            res.send(`Send`);
         }
 
-        const connectionRequestX = new ConnectionRequest({fromUserId,toUserId,status});
-        await connectionRequestX.save();
-        res.send(`Send`);
+        
 
     }catch(err){
         res.send(`ERROR : ${err.message}`)
