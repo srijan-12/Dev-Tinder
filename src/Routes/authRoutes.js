@@ -52,7 +52,7 @@ authRouter.post("/login", async(req,res)=>{
             if(isValidate){
                 const token = await foundUser.getJWT();
                 res.cookie("token", token, {maxAge: 7 * 24 * 60 * 60*1000})
-                res.send(`Logged in`);
+                res.status(200).json({"status":"loggedin", "user" : foundUser});
             }else{
                 throw new Error(`Enter valid credentials`);
             }
