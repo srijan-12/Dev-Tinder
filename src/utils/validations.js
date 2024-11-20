@@ -1,65 +1,90 @@
 const validator = require("validator");
 
-function trimHere(str){
-    return str.trim();
-}
-
-
-const validateSignUp = (req) =>{
-    const {firstName,email,phoneNumber,password,age,gender,about} = req.body;
-        if(firstName&&email&&phoneNumber&&password&&age&&gender&&about){
-            let trimedFirstName = trimHere(firstName);
-            let trimedEmail = trimHere(email);
-            let trimedPhoneNumber = trimHere(phoneNumber);
-            let trimedPassword = trimHere(password);
-            let trimedAge = trimHere(age);
-            let trimedGender = trimHere(gender);
-            let trimedAbout = trimHere(about);
-            if(!trimedFirstName.length >= 3){
-                throw new Error(`First name must be of atleast 3 characters long`)
-            }else if(!validator.isEmail(trimedEmail)){
-                throw new Error(`Please enter valid e-mail`)
-            }else if(!validator.isStrongPassword(trimedPassword)){
-                throw new Error(`Password must contains alphanumeric and special characters and must be atleast 8-digits long`)
-            }else if(!validator.isMobilePhone(trimedPhoneNumber, 'any')){
-                throw new Error(`Please enter a valid Phone number`)
-            }else if(!trimedAge >= 18){
-                throw new Error(`You are not 18+`)
-            }else if(!["male","female","others"].includes(trimedGender)){
-                throw new Error(`Please enter valid gender`);
-            }else if(!(trimedAbout.length > 0)){
-                throw new Error(`Please enter something about yourself`);
-            }
-        }else{
-            throw new Error(`All fields are required`)
-        }
-}
-
-
-const validateLogin = (req) =>{
-    const {email,password} = req.body;
-    function trimHere(str){
+// Utility function to safely trim input
+function trimHere(str) {
+    if (typeof str === "string") {
         return str.trim();
     }
-        let trimedEmail = trimHere(email);
-        let trimedPassword = trimHere(password);
-    
-        if(!validator.isEmail(trimedEmail)){
-            throw new Error(`Please enter valid e-mail`)
-        }else if(!validator.isStrongPassword(trimedPassword)){
-            throw new Error(`Password must contains alphanumeric and special characters and must be atleast 8-digits long`)
-        }
+    return str; // Return the value as-is if it's not a string
 }
 
+// Validation for Sign-Up
+const validateSignUp = (req) => {
+    const { firstName, email, phoneNumber, password, age, gender, about } = req.body;
 
+    if (!firstName || !email || !phoneNumber || !password || !age || !gender || !about) {
+        throw new Error(`All fields are required`);
+    }
 
+    const trimedFirstName = trimHere(firstName);
+    const trimedEmail = trimHere(email);
+    const trimedPhoneNumber = trimHere(phoneNumber);
+    const trimedPassword = trimHere(password);
+    const trimedAge = Number(trimHere(age)); // Ensure age is treated as a number
+    const trimedGender = trimHere(gender);
+    const trimedAbout = trimHere(about);
 
+    if (trimedFirstName.length < 3) {
+        throw new Error(`First name must be at least 3 characters long`);
+    }
+
+    if (!validator.isEmail(trimedEmail)) {
+        throw new Error(`Please enter a valid email`);
+    }
+
+    if (!validator.isStrongPassword(trimedPassword)) {
+        throw new Error(
+            `Password must contain alphanumeric characters, special characters, and be at least 8 characters long`
+        );
+    }
+
+    if (!validator.isMobilePhone(trimedPhoneNumber, "any")) {
+        throw new Error(`Please enter a valid phone number`);
+    }
+
+    if (trimedAge < 18) {
+        throw new Error(`You must be at least 18 years old`);
+    }
+
+    if (!["male", "female", "others"].includes(trimedGender.toLowerCase())) {
+        throw new Error(`Please enter a valid gender`);
+    }
+
+    if (trimedAbout.length === 0) {
+        throw new Error(`Please enter something about yourself`);
+    }
+};
+
+// Validation for Login
+const validateLogin = (req) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        throw new Error(`Email and password are required`);
+    }
+
+    const trimedEmail = trimHere(email);
+    const trimedPassword = trimHere(password);
+
+    if (!validator.isEmail(trimedEmail)) {
+        throw new Error(`Please enter a valid email`);
+    }
+
+    if (!validator.isStrongPassword(trimedPassword)) {
+        throw new Error(
+            `Password must contain alphanumeric characters, special characters, and be at least 8 characters long`
+        );
+    }
+};
+
+// Validation for Profile Edit
 const validateProfileEdit = (req) => {
-    const {firstName, lastName, phoneNumber, age, gender, photoUrl, skills,about} = req.body;
+    try{
+        const { firstName, lastName, phoneNumber, age, gender, photoUrl, skills, about } = req.body;
     let userData = {};
 
     if (firstName) {
-        let trimedFirstName = trimHere(firstName);
+        const trimedFirstName = trimHere(firstName);
         if (trimedFirstName.length < 3) {
             throw new Error(`First name must be at least 3 characters long`);
         }
@@ -67,7 +92,7 @@ const validateProfileEdit = (req) => {
     }
 
     if (lastName) {
-        let trimedLastName = trimHere(lastName);
+        const trimedLastName = trimHere(lastName);
         if (trimedLastName.length < 3) {
             throw new Error(`Last name must be at least 3 characters long`);
         }
@@ -75,31 +100,24 @@ const validateProfileEdit = (req) => {
     }
 
     if (phoneNumber) {
-        let trimedPhoneNumber = trimHere(phoneNumber);
-        if (!validator.isMobilePhone(trimedPhoneNumber, 'any')) {
+        const trimedPhoneNumber = trimHere(phoneNumber.toString()); // Convert to string
+        if (!validator.isMobilePhone(trimedPhoneNumber, "any")) {
             throw new Error(`Please enter a valid phone number`);
         }
         userData.phoneNumber = trimedPhoneNumber;
     }
-
-    // if (password) {
-    //     let trimedPassword = trimHere(password);
-    //     if (!validator.isStrongPassword(trimedPassword)) {
-    //         throw new Error(`Password must contain alphanumeric and special characters, and must be at least 8 characters long`);
-    //     }
-    //     userData.password = trimedPassword;
-    // }
+    
 
     if (age) {
-        let trimedAge = parseInt(trimHere(age), 10);
-        if (trimedAge <= 18) {
+        const parsedAge = Number(trimHere(age)); // Ensure age is treated as a number
+        if (isNaN(parsedAge) || parsedAge <= 18) {
             throw new Error(`You must be older than 18`);
         }
-        userData.age = trimedAge;
+        userData.age = parsedAge;
     }
 
     if (gender) {
-        let trimedGender = trimHere(gender);
+        const trimedGender = trimHere(gender);
         if (!["male", "female", "others"].includes(trimedGender.toLowerCase())) {
             throw new Error(`Please enter a valid gender`);
         }
@@ -107,7 +125,7 @@ const validateProfileEdit = (req) => {
     }
 
     if (photoUrl) {
-        let trimedUrl = trimHere(photoUrl);
+        const trimedUrl = trimHere(photoUrl);
         if (!validator.isURL(trimedUrl)) {
             throw new Error(`Please enter a valid URL`);
         }
@@ -115,26 +133,27 @@ const validateProfileEdit = (req) => {
     }
 
     if (skills) {
-        if (!Array.isArray(skills) || skills.length === 0) {
+        if (!Array.isArray(skills)) {
+            throw new Error(`Skills must be an array`);
+        }
+        if (skills.length === 0) {
             throw new Error(`Please enter at least one skill`);
         }
         userData.skills = skills;
     }
 
     if (about) {
-        let trimedAbout = trimHere(about);
-        console.log("length " ,trimedAbout.length)
-        if(trimedAbout.length < 0){
+        const trimedAbout = trimHere(about);
+        if (trimedAbout.length === 0) {
             throw new Error(`Please enter something about yourself`);
         }
         userData.about = trimedAbout;
     }
 
-    return userData; 
+    return userData;
+    }catch(err){
+        return err.message;
+    }
 };
 
-
-
-
-
-module.exports = {validateSignUp, validateLogin, validateProfileEdit};
+module.exports = { validateSignUp, validateLogin, validateProfileEdit };

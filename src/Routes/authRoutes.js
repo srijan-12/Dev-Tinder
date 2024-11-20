@@ -58,8 +58,7 @@ authRouter.post("/login", async(req,res)=>{
             }
         }
     }catch(err){
-        res.send(`ERROR! ${err.message}`);
-        console.log(err);
+        res.status(400).json({"error":`ERROR! ${err.message}`});
     }
 })
 
@@ -68,7 +67,7 @@ authRouter.post("/logout", (req,res)=>{
     res.cookie("token", null, {
         maxAge : 0
     } )
-    res.send("Logged out");
+    res.status(200).json({"status":"logged out", "user" : null});
 })
 
 

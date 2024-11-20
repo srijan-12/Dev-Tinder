@@ -11,10 +11,9 @@ const hashPassword = require("../utils/passwordEncrypt.js")
 profileRouter.post("/profile/view",userAuth,(req,res)=>{
     try{
         let user = req.user;
-        res.send(user);
+        res.status(200).send(user);
     }catch(err){
-        res.send(`ERROR : ${err.message}`);
-        console.log(err);
+        res.status(400).send(`ERROR : ${err.message}`);
     }
 })
 
@@ -22,9 +21,9 @@ profileRouter.post("/profile/view",userAuth,(req,res)=>{
 profileRouter.patch("/profile/edit",userAuth, async(req,res)=>{
     try{
         let userData = validateProfileEdit(req);
-
+        console.log(userData)
+        if (typeof(userData) === "string") throw new Error(userData);
         let allowedFields = ["firstName","lastName","phoneNumber","age","gender","photoUrl","skills","about"];
-        console.log(Object.keys(userData));
         let isAllowed = Object.keys(userData).every((field)=>{
             return allowedFields.includes(field);
         })
@@ -38,15 +37,13 @@ profileRouter.patch("/profile/edit",userAuth, async(req,res)=>{
         }
 
         let loggedInUser = req.user;
-        console.log(loggedInUser);
 
         let userX = await User.findByIdAndUpdate(loggedInUser._id, userData, {runValidators: true, new: true});
-        console.log(userX);
-        res.send(`Updated`);
+        res.status(200).send(`Updated`);
 
     }catch(err){
-        res.send(`ERROR : ${err.message}`)
-        console.log(err);
+        console.log(err.message)
+        res.status(400).send(`ERROR : ${err.message}`)
     }
 })
 
@@ -74,13 +71,12 @@ profileRouter.patch("/profile/forgetpassword", userAuth,async(req,res)=>{
             
             loggedInUser.password = newPasswordHash;
             await loggedInUser.save();
-            res.send(`Password updated`);
+            res.status(200).send(`Password updated`);
         }
 
         
     }catch(err){
-        res.send(`ERROR : ${err.message}`)
-        console.log(err);
+        res.status(400).send(`ERROR : ${err.message}`)
     }
 })
 
