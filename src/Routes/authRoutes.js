@@ -27,12 +27,13 @@ authRouter.post('/signup', async (req,res)=>{
             about
         })
         await userX.save();
-
-        res.send(`User added`);
+        const token = await userX.getJWT();
+        res.cookie("token", token, {maxAge: 7 * 24 * 60 * 60*1000})
+        res.status(200).json({"status":"loggedin", "user" : userX});
 
     }catch(err){
-        res.send(`ERROR! ${err.message}`);
-        console.log(err)
+        res.status(400).send(`ERROR! ${err.message}`);
+        console.log(err.message,"comming from here??")
     }
 })
 

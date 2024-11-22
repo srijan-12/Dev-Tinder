@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
   },
   photoUrl: {
     type: String,
-    default: "https://akshaysaini.in/img/akshay.jpg",
+    default: "https://thequotecircle.org/wp-content/uploads/2022/06/blank-profile-picture-hd-images-photo.jpg.webp",
     validate(value){
         if(!validator.isURL(value)){
             throw new Error(`Enter correct url`)
